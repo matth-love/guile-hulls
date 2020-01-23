@@ -1,0 +1,208 @@
+#!/bin/sh
+# -*- scheme -*-
+prefix="/usr"
+exec_prefix="/usr"
+exec ${GUILE:-/usr/bin/guile} $GUILE_FLAGS -e '(@@ (hull) main)' -s "$0" "$@"
+!#
+
+;; hulls.scm - Generate a hull of a set of points
+;;
+;; Copyright (c) 2018 Matthew Love <matthew.love@colorado.edu>
+;;
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; The program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with the program.  If not, see <http://www.gnu.org/licenses/>.
+;;
+;;; Commentary:
+;; Usage: hull [ -hfv [ args ] ] [ files ]
+;;
+;; [ h u l l ]
+;;
+;; Use -f to format the output; otherwise will output a scheme list of vector-points.
+;; e.g.
+;; hull file.xyz
+;; (#(x y) #(x y) ... #(x y))
+;;
+;; hull -f file.xyz
+;; # @VGMT-1.0 @GPOLYGON~%# @NName
+;; >
+;; # @DName
+;; x1 y1
+;; x2 y2
+;; ...
+;; x1 y1
+;;
+;; Note: if no file is given, will read from standard input.
+;;
+;;; Code:
+
+(define-module (hull)
+  #:use-module (ice-9 getopt-long)
+  #:use-module (ice-9 rdelim)
+  #:use-module (ice-9 format)
+  #:use-module (hulls convex-hull))
+
+(define hull-version "0.0.4")
+
+(define %summary "Generate a hull from xyz data.")
+
+(define command-synopsis
+  '((version (single-char #\v) (value #f))
+    (help (single-char #\h) (value #f))
+    (format (single-char #\f) (value #f))))
+
+(define (display-help)
+  (format #t "\
+~a
+ [ h u l l ]
+
+usage: hull [ hfv [ args ] ] [ files ]
+
+  Use -f to format the output; otherwise will output a scheme list of vector-points.
+  e.g.
+  $ hull file.xyz
+  
+  (#(x y) #(x y) ... #(x y))
+
+  $ hull -f file.xyz
+  
+  # @VGMT-1.0 @GPOLYGON
+  # @NName
+  >
+  # @DName
+  x1 y1
+  x2 y2
+  ...
+  x1 y1
+
+Note: if no file is given, will read from standard input.
+" %summary))
+
+(define (display-version)
+  (format #t "\
+hull [ guile-hulls ] version ~a
+Copyright (c) 2018 Matthew Love
+
+License LGPLv3+: GNU LGPL 3 or later <http://gnu.org/licenses/lgpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+" hull-version))
+
+(define (hull args)
+  (let* ((options (getopt-long args command-synopsis)))
+    (let ((help-wanted (option-ref options 'help #f))
+	  (version-wanted (option-ref options 'version #f))
+	  (format-wanted (option-ref options 'format #f)))
+      (cond
+       (version-wanted (display-version))
+       (help-wanted (display-help))
+       (else
+	(let ((input (option-ref options '() #f)))
+	  (let* ((infile (if (not (pair? input)) 
+			     (current-input-port) 
+			     (open-file (car input) "r"))))
+	    (let ((my-xys (xyz->scm infile #:index "xy")))
+	      (if format-wanted
+		  (begin
+		    (let ((this-hull (map vector->list (convex-hull my-xys))))
+		      (format #t "# @VGMT-1.0 @GPOLYGON~%# @NName~%>~%# @D~a~%" (port-filename infile))
+		      (xyz-display this-hull)
+		      (xyz-display (car this-hull))))
+		  (write (convex-hull my-xys)))))))))))
+
+(define main hull)
+
+(define* (xyz-read-line
+	  #:optional 
+	  (port (current-input-port))
+	  (xyzs '()))
+  (let ((this-char (peek-char port)))
+    (cond
+     ((eof-object? this-char)
+      xyzs)
+     (else
+      (xyz-read-line port (cons (read-delimited " \n" port) xyzs))))))
+
+(define* (xyz-read-line 
+	  #:optional (port (current-input-port))
+	  #:key 
+	  (data-fun (lambda (data-line) 
+		      (map string->number data-line))))
+  (define %known-delimiters 
+    '(#\sp #\, #\ht #\; #\| #\/ #\:))
+  (define string-split/delims 
+    (lambda (str)
+      (let lp ((delims %known-delimiters))
+	(let ((l (string-split str (car delims))))
+	  (cond
+	   ((not (null? (cdr l))) l)
+	   ((not (null? (cdr delims)))
+	    (lp (cdr delims)))
+	   (else '()))))))
+  (let ((this-char (peek-char port)))
+    (cond 
+     ((eof-object? this-char)
+      this-char)
+     (else
+      (let ((data-line (string-split/delims (read-line port))))
+	(data-fun data-line))))))
+
+(define* (make-xyz-reader 
+	  #:optional 
+	  (port (current-input-port))
+	  #:key 
+	  (data-fun (lambda (data-list) 
+		      (map string->number data-list))))
+  (lambda (port)
+    (let lp ((this-port port) (out-data '()))
+      (let ((this-line (xyz-read-line port #:data-fun data-fun)))
+	(if (eof-object? this-line) out-data
+	    (lp this-port (cons this-line out-data)))))))
+
+(define* (xyz->scm port #:key 
+		   (delimiter #f) 
+		   (header #f)
+		   (test-fun #f) 
+		   (index "xyz"))
+  (define xyz-line->xyz-list
+    (lambda (xyz-line)
+      (let ((xpos (string-index index #\x))
+	    (ypos (string-index index #\y))
+	    (zpos (string-index index #\z)))
+	(vector
+	 (if xpos (string->number (list-ref xyz-line xpos)) (nan))
+	 (if ypos (string->number (list-ref xyz-line ypos)) (nan))
+	 (if zpos (string->number (list-ref xyz-line zpos)) (nan))))))
+  (define reader (make-xyz-reader port #:data-fun xyz-line->xyz-list))
+  (let ((xyz (reader port)))
+    (if header (cdr xyz) xyz)))
+
+(define* (xyz-display xyz
+		      #:optional 
+		      (port (current-output-port))
+		      #:key
+		      (delim #\sp))
+  (if (pair? xyz)
+      (if (pair? (car xyz))
+	  (let loop ((these-xyz xyz))
+	    (when (pair? these-xyz)
+		  (xyz-display (car these-xyz) port)
+		  (loop (cdr these-xyz))))
+	  (begin
+	    (let loop ((this-point xyz))
+	      (display (car this-point) port)
+	      (when (not (null? (cdr this-point)))
+		    (display delim port)
+		    (loop (cdr this-point))))
+	    (newline port)))))
+	   
+;;; End

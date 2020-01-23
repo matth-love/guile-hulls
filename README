@@ -1,0 +1,79 @@
+
+ [ G U I L E - H U L L S ]
+
+---------------------------
+
+GUILE-HULLS is a guile module for generating hulls of point-sets.
+
+- Installation:
+
+autoreconf -vif
+./configure
+make
+sudo make install
+
+---------------------------
+
+GUILE-HULLS provides the following module(s):
+
+- (hulls convex-hull)
+
+-- Module: convex-hull
+   Algorithms for discovering the convex hull of a set of points.
+   The function convex-hull uses the default alogrithm amc-convex-hull.
+   This implements Andrew's Monotone Chain algorithm to discover the 
+   hull boundary of a set of points.
+
+   `pw-convex-hull implements a 'package-wrap' algorithm to discover the hull. 
+   This method is tedious and slow, especially on large datasets, 
+   but will eventually find the hull it's looking for.
+
+   Use convex-hull point-list to return a point-list of the hull.
+   a point-list is a list of point-vectors '(#(x y ...) #(x y ...) ... #(x y ...))
+
+-- Scheme Procedure: convex-hull points
+   Implements Andrew's monotone chain algorithm. O(n log n) complexity.
+   points is a list of point-vectors '(#(x y) #(x y) ... #(x y)).
+   Returns the x/y points that make up the hull.
+
+-- Scheme Procedure: amc-convex-hull points
+   Implements Andrew's monotone chain algorithm. O(n log n) complexity.
+   points is a list of point-vectors '(#(x y) #(x y) ... #(x y)).
+   Returns the x/y points that make up the hull.
+
+-- Scheme Procedure: pw-convex-hull points
+   Implements a package-wrap algorithm to discover the convex hull of a set of points.
+   points is a list of point-vectors '(#(x . y) #(x . y) ... #(x .y)).
+   Returns a point-list of the hull nodes.
+
+---------------------------
+
+GUILE-HULLS provides the following script(s):
+
+- hull
+
+-- Script: hull
+   Generate a hull of a set of points in xy* format.
+
+   Current hull options: convex-hull
+
+   usage: hull [ hfv [ args ] ] [ files ]
+
+   Use -f to format the output; otherwise will output a scheme list of vector-points.
+   e.g.
+   $ hull file.xyz
+  
+   (#(x y) #(x y) ... #(x y))
+
+   $ hull -f file.xyz
+  
+   # @VGMT-1.0 @GPOLYGON
+   # @NName
+   >
+   # @DName
+   x1 y1
+   x2 y2
+   ...
+   x1 y1
+
+   Note: if no file is given, will read from standard input.

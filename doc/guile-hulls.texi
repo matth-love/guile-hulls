@@ -1,0 +1,166 @@
+\input texinfo  @c -*-Texinfo-*-
+
+@c To compile: makeinfo  -I . guile-hulls.texi -o guile-hulls.info
+
+@setfilename guile-hulls.info
+@settitle Guile-Hulls Manual
+@footnotestyle end
+
+@ifinfo
+@dircategory The Algorithmic Language Scheme
+@direntry
+* guile-hulls: (guile-hulls).	guile-hulls manual
+@end direntry
+
+This is @cite{The Guile-Hulls Manual}, for guile-hulls.
+
+Copyright 2010, 2011, 2012, 2013, 2018 Matthew Love.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+@end ignore
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+@end ifinfo
+
+@titlepage
+@title guile-hulls
+@subtitle gule hulls
+@subtitle Manual
+@author Matthew Love
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2010, 2011, 2012, 2013, 2018 Matthew Love.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the entire
+resulting derived work is distributed under the terms of a permission
+notice identical to this one.
+@end titlepage
+
+@node Top, Copying, (dir), (dir)
+
+@ifnottex
+This document describes the scheme library and programs @code{guile-hulls}.
+
+@end ifnottex
+
+@menu
+* Copying::                     Distribution conditions
+* Introduction::                Brief introduction to Guile-Hulls
+
+* Library::                     The Guile-Hulls Library
+* Scripts::                     The Scripts of Guile-Hulls
+* Examples::                    Examples
+@end menu
+
+@node Copying, Introduction, Top, Top
+@chapter Copying
+@cindex Copying
+
+guile-hulls is copyright (C) 2010, 2011, 2012, 2013, 2016 Matthew Love <matthew.love@@colorado.edu>
+and is released under the terms of the GNU General Public License. See the included file
+@file{COPYING} for the full text of the license (or @pxref{Copying, ,
+Copying, emacs, The GNU Emacs Manual}).
+
+@quotation
+This is free software -- you are welcome to redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2, or
+(at your option) any later version.
+
+guile-geo is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+@end quotation
+
+@node Introduction, Library, Copying, Top
+@chapter Introduction
+@cindex Introduction
+
+Guile Hulls (GUILE-HULLS) is a guile scheme module for the generation and discover of hulls.
+
+This manual is for Guile-Hulls version 0.0.2
+
+@node Library, Scripts, Introduction, Top
+@chapter Library
+@cindex library
+
+Guile-Hulls is a guile scheme library of functions.
+
+@menu
+* convex-hull::
+@end menu
+
+@node convex-hull, , Library, Library
+@section convex-hull
+@cindex libraries
+
+@deffn {Scheme Procedure} convex-hull points
+       Generate a convex hull of a set of xy* points.
+       @var{points} should be a list of x/y point-vectors: `(#(x y ...) #(x y ...) ... #(x y ...))
+
+       This procedure runs @var{amc-convex-hull}
+
+       Returns the hull as list of x/y point-vectors.
+@end deffn
+
+@deffn {Scheme Procedure} amc-convex-hull points
+    Implements Andrew's monotone chain algorithm. O(n log n) complexity.
+    @var{points} is a list of point-vectors `(#(x . y) #(x . y) ... #(x .y)).
+
+    Returns the x/y points that make up the hull as a list of point-vectors.
+@end deffn
+
+@deffn {Scheme Procedure} pw-convex-hull points
+    Implements a package-wrap algorithm to discover the convex hull of a set of points.
+    @var{points} is a list of point-vectors `(#(x . y) #(x . y) ... #(x .y)).
+
+    Returns the x/y points that make up the hull as a list of x/y point-vectors.
+@end deffn
+
+@node Scripts, Examples, Library, Top
+@chapter Scripts
+@cindex Scripts
+
+Guile-Hulls includes a the command-line utility @var{hull}
+@menu
+* hull::   
+@end menu
+
+@node hull, , Scripts, Scripts
+@section hull
+@cindex scripts
+@verbatim
+
+Generate a hull from xyz data.
+ [ h u l l ]
+
+usage: hull [ hfvD [ args ] ] [ files ]
+
+@end verbatim
+@node Examples, ,Scripts, Top
+@chapter Examples
+@cindex Examples
+
+Use the hull script to discover a hull from a set of xyz points in the file data.xyz and output the hull to the file data.hull:
+
+    $ hull data.xyz -f > data.hull
+
+@contents
+@bye

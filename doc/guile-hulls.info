@@ -1,0 +1,158 @@
+This is guile-hulls.info, produced by makeinfo version 5.1 from
+guile-hulls.texi.
+
+INFO-DIR-SECTION The Algorithmic Language Scheme
+START-INFO-DIR-ENTRY
+* guile-hulls: (guile-hulls).	guile-hulls manual
+END-INFO-DIR-ENTRY
+
+This is 'The Guile-Hulls Manual', for guile-hulls.
+
+   Copyright 2010, 2011, 2012, 2013, 2018 Matthew Love.
+
+   Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+   Permission is granted to copy and distribute modified versions of
+this manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+
+File: guile-hulls.info,  Node: Top,  Next: Copying,  Prev: (dir),  Up: (dir)
+
+This document describes the scheme library and programs 'guile-hulls'.
+
+* Menu:
+
+* Copying::                     Distribution conditions
+* Introduction::                Brief introduction to Guile-Hulls
+
+* Library::                     The Guile-Hulls Library
+* Scripts::                     The Scripts of Guile-Hulls
+* Examples::                    Examples
+
+
+File: guile-hulls.info,  Node: Copying,  Next: Introduction,  Prev: Top,  Up: Top
+
+1 Copying
+*********
+
+guile-hulls is copyright (C) 2010, 2011, 2012, 2013, 2016 Matthew Love
+<matthew.love@colorado.edu> and is released under the terms of the GNU
+General Public License.  See the included file 'COPYING' for the full
+text of the license (or *note Copying: (emacs)Copying.).
+
+     This is free software - you are welcome to redistribute it and/or
+     modify it under the terms of the GNU General Public License as
+     published by the Free Software Foundation; either version 2, or (at
+     your option) any later version.
+
+     guile-geo is distributed in the hope that it will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+     General Public License for more details.
+
+
+File: guile-hulls.info,  Node: Introduction,  Next: Library,  Prev: Copying,  Up: Top
+
+2 Introduction
+**************
+
+Guile Hulls (GUILE-HULLS) is a guile scheme module for the generation
+and discover of hulls.
+
+   This manual is for Guile-Hulls version 0.0.2
+
+
+File: guile-hulls.info,  Node: Library,  Next: Scripts,  Prev: Introduction,  Up: Top
+
+3 Library
+*********
+
+Guile-Hulls is a guile scheme library of functions.
+
+* Menu:
+
+* convex-hull::
+
+
+File: guile-hulls.info,  Node: convex-hull,  Prev: Library,  Up: Library
+
+3.1 convex-hull
+===============
+
+ -- Scheme Procedure: convex-hull points
+     Generate a convex hull of a set of xy* points.  POINTS should be a
+     list of x/y point-vectors: '(#(x y ...)  #(x y ...)  ...  #(x y
+     ...))
+
+     This procedure runs AMC-CONVEX-HULL
+
+     Returns the hull as list of x/y point-vectors.
+
+ -- Scheme Procedure: amc-convex-hull points
+     Implements Andrew's monotone chain algorithm.  O(n log n)
+     complexity.  POINTS is a list of point-vectors '(#(x .  y) #(x .
+     y) ...  #(x .y)).
+
+     Returns the x/y points that make up the hull as a list of
+     point-vectors.
+
+ -- Scheme Procedure: pw-convex-hull points
+     Implements a package-wrap algorithm to discover the convex hull of
+     a set of points.  POINTS is a list of point-vectors '(#(x .  y) #(x
+     .  y) ...  #(x .y)).
+
+     Returns the x/y points that make up the hull as a list of x/y
+     point-vectors.
+
+
+File: guile-hulls.info,  Node: Scripts,  Next: Examples,  Prev: Library,  Up: Top
+
+4 Scripts
+*********
+
+Guile-Hulls includes a the command-line utility HULL
+* Menu:
+
+* hull::   
+
+
+File: guile-hulls.info,  Node: hull,  Prev: Scripts,  Up: Scripts
+
+4.1 hull
+========
+
+
+Generate a hull from xyz data.
+ [ h u l l ]
+
+usage: hull [ hfvD [ args ] ] [ files ]
+
+
+
+File: guile-hulls.info,  Node: Examples,  Prev: Scripts,  Up: Top
+
+5 Examples
+**********
+
+Use the hull script to discover a hull from a set of xyz points in the
+file data.xyz and output the hull to the file data.hull:
+
+   $ hull data.xyz -f > data.hull
+
+
+
+Tag Table:
+Node: Top747
+Node: Copying1188
+Node: Introduction2065
+Node: Library2328
+Node: convex-hull2517
+Node: Scripts3505
+Node: hull3686
+Node: Examples3862
+
+End Tag Table
