@@ -1,0 +1,2 @@
+*.am linguist-vendored
+*.m4 linguist-vendored
