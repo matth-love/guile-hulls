@@ -121,16 +121,16 @@ There is NO WARRANTY, to the extent permitted by law.
 
 (define main hull)
 
-(define* (xyz-read-line
-	  #:optional 
-	  (port (current-input-port))
-	  (xyzs '()))
-  (let ((this-char (peek-char port)))
-    (cond
-     ((eof-object? this-char)
-      xyzs)
-     (else
-      (xyz-read-line port (cons (read-delimited " \n" port) xyzs))))))
+;; (define* (xyz-read-line
+;; 	  #:optional 
+;; 	  (port (current-input-port))
+;; 	  (xyzs '()))
+;;   (let ((this-char (peek-char port)))
+;;     (cond
+;;      ((eof-object? this-char)
+;;       xyzs)
+;;      (else
+;;       (xyz-read-line port (cons (read-delimited " \n" port) xyzs))))))
 
 (define* (xyz-read-line 
 	  #:optional (port (current-input-port))
@@ -172,7 +172,7 @@ There is NO WARRANTY, to the extent permitted by law.
 		   (delimiter #f) 
 		   (header #f)
 		   (test-fun #f) 
-		   (index "xyz"))
+		   (index "xy"))
   (define xyz-line->xyz-list
     (lambda (xyz-line)
       (let ((xpos (string-index index #\x))
@@ -180,8 +180,8 @@ There is NO WARRANTY, to the extent permitted by law.
 	    (zpos (string-index index #\z)))
 	(vector
 	 (if xpos (string->number (list-ref xyz-line xpos)) (nan))
-	 (if ypos (string->number (list-ref xyz-line ypos)) (nan))
-	 (if zpos (string->number (list-ref xyz-line zpos)) (nan))))))
+	 (if ypos (string->number (list-ref xyz-line ypos)) (nan))))))
+	 ;(if zpos (string->number (list-ref xyz-line zpos)) (nan))))))
   (define reader (make-xyz-reader port #:data-fun xyz-line->xyz-list))
   (let ((xyz (reader port)))
     (if header (cdr xyz) xyz)))
