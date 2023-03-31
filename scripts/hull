@@ -51,7 +51,7 @@ exec ${GUILE:-/usr/bin/guile} $GUILE_FLAGS -e '(@@ (hull) main)' -s "$0" "$@"
   #:use-module (ice-9 format)
   #:use-module (hulls convex-hull))
 
-(define hull-version "0.0.4")
+(define hull-version "0.0.6")
 
 (define %summary "Generate a hull from xyz data.")
 
@@ -90,7 +90,7 @@ Note: if no file is given, will read from standard input.
 (define (display-version)
   (format #t "\
 hull [ guile-hulls ] version ~a
-Copyright (c) 2018 Matthew Love
+Copyright (c) 2018 - 2023 MRL
 
 License LGPLv3+: GNU LGPL 3 or later <http://gnu.org/licenses/lgpl.html>.
 This is free software: you are free to change and redistribute it.

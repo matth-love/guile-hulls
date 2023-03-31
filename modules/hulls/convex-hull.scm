@@ -30,7 +30,7 @@
 ;;; Code:
 
 (define-module (hulls convex-hull)
-  #:version (0 0 5)
+  #:version (0 0 6)
   #:export
   (convex-hull amc-convex-hull pw-convex-hull))
 
@@ -98,16 +98,16 @@
 		      (hull '()) 
 		      (last-theta 0))
 	(cond 
-	 ((null? xys) hull)
+	 ((null? xys) (cdr hull))
 	 ((null? hull)
 	  (find-hull (cdr xys) (append (list (car xys)) hull) last-theta))
 	 (else
 	  (let ((next-point (pw-next-node (car hull) (cdr xys) last-theta)))
-	    (if (null? (car next-point)) hull
+	    (if (null? (car next-point)) (cdr hull)
 		(find-hull (cdr xys) 
 			   (append (list (car next-point)) hull) 
 			   (cdr next-point)))))))))
 
-(define convex-hull amc-convex-hull)
+(define convex-hull pw-convex-hull)
 
 ;;; End
