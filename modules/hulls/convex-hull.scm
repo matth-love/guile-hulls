@@ -1,7 +1,7 @@
 ;;*-scheme-*
 ;;; convex-hull.scm
 ;;
-;; Copyright (c) 2011, 2012, 2013, 2016, 2018 Matthew Love <matthew.love@colorado.edu>
+;; Copyright (c) 2011, 2012, 2013, 2016, 2018 - 2023 Matthew Love <matthew.love@colorado.edu>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 ;;; Code:
 
 (define-module (hulls convex-hull)
-  #:version (0 0 4)
+  #:version (0 0 5)
   #:export
   (convex-hull amc-convex-hull pw-convex-hull))
 
@@ -42,7 +42,7 @@
   (let ((t (atan (- (vector-ref point-b 1) (vector-ref point-a 1))
 		 (- (vector-ref point-b 0) (vector-ref point-a 0)))))
     (if (>= t 0) t
-    	(+ t (* 2 ch-pi)))))
+	(+ t (* 2 ch-pi)))))
 
 (define (ch-cross point-a point-b point-c)
   "- Scheme Procedure: ch-cross point-a point-b point-c
@@ -66,7 +66,7 @@
      ((< (length hull) 2)
       (amc-find-hull (cdr xys) (append (list (car xys)) hull)))
      ((<= (ch-cross (cadr hull) (car hull) (car xys)) 0)
-      (amc-find-hull (cdr xys) (cdr hull)))
+      (amc-find-hull xys (cdr hull)))
      (else
       (amc-find-hull (cdr xys) (append (list (car xys)) hull)))))
   (if (not (pair? points)) points
@@ -100,7 +100,7 @@
 	(cond 
 	 ((null? xys) hull)
 	 ((null? hull)
-	  (find-hull (cdr xys) (append (list (car xys)) hull) 0))
+	  (find-hull (cdr xys) (append (list (car xys)) hull) last-theta))
 	 (else
 	  (let ((next-point (pw-next-node (car hull) (cdr xys) last-theta)))
 	    (if (null? (car next-point)) hull
