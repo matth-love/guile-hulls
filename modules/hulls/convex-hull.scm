@@ -108,6 +108,6 @@
 			   (append (list (car next-point)) hull) 
 			   (cdr next-point)))))))))
 
-(define convex-hull pw-convex-hull)
+(define convex-hull amc-convex-hull)
 
 ;;; End
